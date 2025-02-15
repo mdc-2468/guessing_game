@@ -1,101 +1,93 @@
 'use strict';
-let myNum;
-let guess;
-let userGuessArray = [];
-let score = 20;
-let highestScore = 0;
-let rounds = 0;
 
-function genMyNum() {
-  myNum = Math.floor(Math.random() * 20 + 1);
-  console.log(`The answer is: ${myNum}`);
+let score = 0;
+let rounds = 0;
+let highestScore = 0;
+let ans;
+let guess = document.querySelector(".guess");
+let guessValue;
+let guessArr = [];
+const msg = document.querySelector(".message");
+const scoreUI = document.querySelector(".score");
+const scoreLabelUI = document.querySelector(".label-score");
+const highestScoreUI = document.querySelector(".highscore");
+const roundsUI = document.querySelector(".rounds");
+const ansUI = document.querySelector(".number");
+
+function genAns() {
+  ans = Math.floor(Math.random() * 20 + 1);
+  console.log(`The answer for this round is ${ans}`);
 };
 
-function restart() {
-  console.log(`User is trying to restart the game...`);
-
-  // Trigger re-generating the answer
-  genMyNum();
-
-  // Reset the guess number to 0 and user guess list
-  guess = 0;
-  userGuessArray = [];
-
-  // Clear the input
-  document.querySelector(".guess").value = null;
-
-  // Clear the message
-  document.querySelector(".message").innerHTML = '<p class="message">Start guessing...</p>';
-
-  // Reset the score and rounds
-  score = 20;
+function reset() {
+  console.log("Resetting the game");
+  score = 0;
   rounds = 0;
-  document.querySelector(".score").textContent = 20;
-  document.querySelector(".rounds").textContent = 0;
+  guessArr = [];
+  guess.value = null;
+  msg.innerHTML = '<p class="message">Start guessing...</p>';
+  scoreLabelUI.classList.add("hide");
+  roundsUI.textContent = String(rounds);
+  msg.classList.remove("congratulations");
+  ansUI.textContent = "?";
 
-  // Reset back the check button
-  document.querySelector(".check").style.display = 'block';
-
-  // Hide back the Score
-  document.querySelector(".label-score").classList.remove("show");
-
-  // Log
-  console.log(`Everything has been reset`);
+  genAns();
 
 }
 
-function checkNum() {
-  guess = parseInt(document.querySelector(".guess").value, 10);
-  console.log(`User passed a number of ${guess}`);
+function checkProcess() {
+  // Check if input valid
+  if (!guess.value) {
+    console.log("You didn't share your guess");
+    msg.textContent = "You didn't share your guess";
+  } else {
+    guessValue = Number(guess.value);
+    console.log(`User is guessing ${typeof guessValue} ${guessValue} `);
+    if (guessArr.includes(guessValue)) {
+      msg.textContent = "You had guess this value already"
+    } else {
+      checkAns();
+    }
+  }
 
-  // Check if user has guessed this number already 
-  if (userGuessArray.includes(guess)) {
-    document.querySelector(".message").textContent = "You have already guessed this number";
+}
+
+function checkAns() {
+
+  if (guessValue === ans) {
+    msg.textContent = "You found the answer";
+    console.log("User found the answer");
+    score = 20 - rounds;
+    scoreUI.textContent = String(score);
+    scoreLabelUI.classList.remove("hide");
+    msg.classList.add("congratulations");
+    ansUI.textContent = ans;
+
+    if (score > highestScore) {
+      highestScore = score;
+      highestScoreUI.textContent = String(highestScore);
+    }
 
   } else {
-    userGuessArray.push(guess);
+    if (guessValue > ans) {
+      msg.textContent = "Too high"
+    } else if (guessValue < ans) {
+      msg.textContent = "Too low";
+    };
+    rounds += 1;
+    roundsUI.textContent = String(rounds);
+    guessArr.push(guessValue);
 
-    // Check ans and update score
-    if (guess === myNum) {
-      document.querySelector(".message").innerHTML = '<h3 style="color:red">You knew me!!</h3>'
-      document.querySelector(".label-score").classList.add("show");
-      document.querySelector(".check").style.display = 'none';
-      document.querySelector(".number").textContent = myNum;
-      updateHighestScore();
-
-    } else if (guess > myNum) {
-      score -= 1;
-      rounds += 1;
-      document.querySelector(".rounds").textContent = String(rounds);
-      document.querySelector(".message").textContent = "Too high";
-      document.querySelector(".score").textContent = String(score);
-
-
-    } else if (guess < myNum) {
-      score -= 1;
-      rounds += 1;
-      document.querySelector(".rounds").textContent = String(rounds);
-      document.querySelector(".message").textContent = "Too low";
-      document.querySelector(".score").textContent = String(score);
-
-    }
   }
 }
 
-function updateHighestScore() {
-  if (score > highestScore) {
-    highestScore = score;
-  };
-  document.querySelector(".highscore").textContent = String(highestScore);
 
-}
 
-// Fresh Start on the Page
-console.log("User is entering the game");
-genMyNum();
+// Fresh Start
+genAns();
 
-// Again Button
-document.querySelector(".again").addEventListener("click", restart);
+// Check Button
+document.querySelector(".check").addEventListener("click", checkProcess);
 
-// Check button
-document.querySelector(".check").addEventListener("click", checkNum);
+// Reset Button
+document.querySelector(".again").addEventListener("click", reset);
