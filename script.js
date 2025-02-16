@@ -4,12 +4,16 @@ let score = 0;
 let rounds = 0;
 let highestScore = 0;
 let ans;
-let guess = document.querySelector(".guess");
 let guessValue;
 let guessArr = [];
+let duplicateMsg = "You had guess this value already"
+
+const guess = document.querySelector(".guess");
 const msg = document.querySelector(".message");
 const scoreUI = document.querySelector(".score");
 const scoreLabelUI = document.querySelector(".label-score");
+const highestScoreLabelUI = document.querySelector(".label-highscore");
+const roundsLabelUI = document.querySelector(".label-rounds");
 const highestScoreUI = document.querySelector(".highscore");
 const roundsUI = document.querySelector(".rounds");
 const ansUI = document.querySelector(".number");
@@ -27,6 +31,9 @@ function reset() {
   guess.value = null;
   msg.innerHTML = '<p class="message">Start guessing...</p>';
   scoreLabelUI.classList.add("hide");
+  roundsLabelUI.classList.remove("hide");
+  highestScoreLabelUI.classList.remove("hide");
+  document.querySelector(".check").classList.remove("hide");
   roundsUI.textContent = String(rounds);
   msg.classList.remove("congratulations");
   ansUI.textContent = "?";
@@ -36,20 +43,32 @@ function reset() {
 }
 
 function checkProcess() {
-  // Check if input valid
-  if (!guess.value) {
-    console.log("You didn't share your guess");
-    msg.textContent = "You didn't share your guess";
-  } else {
-    guessValue = Number(guess.value);
-    console.log(`User is guessing ${typeof guessValue} ${guessValue} `);
-    if (guessArr.includes(guessValue)) {
-      msg.textContent = "You had guess this value already"
+  if (rounds < 20) {
+    // Check if input valid
+    if (!guess.value) {
+      console.log("You didn't share your guess");
+      msg.textContent = "You didn't share your guess";
     } else {
-      checkAns();
+      guessValue = Number(guess.value);
+      console.log(`User is guessing ${typeof guessValue} ${guessValue} `);
+      if (guessArr.includes(guessValue)) {
+        if (guessValue > ans) {
+          msg.textContent = duplicateMsg + "(" + " Too high " + ")";
+        } else if (guessValue < ans) {
+          msg.textContent = duplicateMsg + "(" + " Too low " + ")";
+        };
+        rounds += 1;
+        roundsUI.textContent = String(rounds);
+      } else {
+        checkAns();
+      }
     }
+  } else {
+    msg.textContent = "You have failed the mission";
+    roundsLabelUI.classList.add("hide");
+    highestScoreLabelUI.classList.add("hide");
+    document.querySelector(".check").classList.add("hide");
   }
-
 }
 
 function checkAns() {
@@ -80,8 +99,6 @@ function checkAns() {
 
   }
 }
-
-
 
 // Fresh Start
 genAns();
