@@ -34,6 +34,7 @@ function reset() {
   roundsLabelUI.classList.remove("hide");
   highestScoreLabelUI.classList.remove("hide");
   document.querySelector(".check").classList.remove("hide");
+  document.querySelector("body").style.backgroundColor = "#222";
   roundsUI.textContent = String(rounds);
   msg.classList.remove("congratulations");
   ansUI.textContent = "?";
@@ -43,28 +44,36 @@ function reset() {
 }
 
 function checkProcess() {
+  // Normal Handling within 20 rounds
   if (rounds < 20) {
-    // Check if input valid
+
+    // Check if user shared an empty value
     if (!guess.value) {
       console.log("You didn't share your guess");
       msg.textContent = "You didn't share your guess";
     } else {
       guessValue = Number(guess.value);
       console.log(`User is guessing ${typeof guessValue} ${guessValue} `);
+
+      // Check if user had guessed this value already in the past
       if (guessArr.includes(guessValue)) {
         if (guessValue > ans) {
           msg.textContent = duplicateMsg + "(" + " Too high " + ")";
         } else if (guessValue < ans) {
           msg.textContent = duplicateMsg + "(" + " Too low " + ")";
         };
+
         rounds += 1;
         roundsUI.textContent = String(rounds);
+
       } else {
         checkAns();
       }
     }
   } else {
-    msg.textContent = "You have failed the mission";
+    // Failed Handling after 20 rounds
+    msg.textContent = "💥 You have failed the mission";
+    msg.classList.add("congratulations");
     roundsLabelUI.classList.add("hide");
     highestScoreLabelUI.classList.add("hide");
     document.querySelector(".check").classList.add("hide");
@@ -81,24 +90,20 @@ function checkAns() {
     scoreLabelUI.classList.remove("hide");
     msg.classList.add("congratulations");
     ansUI.textContent = ans;
+    document.querySelector("body").style.backgroundColor = "cadetblue";
 
-    if (score > highestScore) {
-      highestScore = score;
-      highestScoreUI.textContent = String(highestScore);
-    }
+    // Update the Highest Score
+    score > highestScore ? highestScore = score : highestScore;
+    highestScoreUI.textContent = String(highestScore);
 
   } else {
-    if (guessValue > ans) {
-      msg.textContent = "Too high"
-    } else if (guessValue < ans) {
-      msg.textContent = "Too low";
-    };
+    msg.textContent = guessValue > ans ? "Too high" : "Too low";
+
     rounds += 1;
     roundsUI.textContent = String(rounds);
     guessArr.push(guessValue);
-
   }
-}
+};
 
 // Fresh Start
 genAns();
